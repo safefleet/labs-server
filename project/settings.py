@@ -25,12 +25,13 @@ SECRET_KEY = '^n%_e574cz%e5%^2a*$(@+=#d6ru)s1rs_a51yhea0zng&0t3b'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    'authentication',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -113,6 +114,8 @@ USE_L10N = True
 
 USE_TZ = True
 
+# user management
+AUTH_USER_MODEL = 'authentication.User'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
