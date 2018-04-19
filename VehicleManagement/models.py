@@ -1,6 +1,10 @@
 from django.db import models
 
-# Create your models here.
+
+class Position(models.Model):
+    car = models.ForeignKey(Journey, on_delete=models.CASCADE())
+    latitude = models.FloatField()
+    longitude = models.FloatField()
 
 
 class Vehicle(Model):
