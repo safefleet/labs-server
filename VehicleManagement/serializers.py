@@ -1,3 +1,7 @@
+class VehicleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Vehicle
+        fields = ('id', 'number', 'type', 'color')
 from rest_framework import serializers
 from VehicleManagement.models import Position,Vehicle,Journey
 
