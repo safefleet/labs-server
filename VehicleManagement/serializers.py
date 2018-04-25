@@ -11,7 +11,7 @@ class VehicleSerializer(serializers.ModelSerializer):
 class PositionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Position
-        fields = ('id', 'car', 'longitude', 'latitude')
+        fields = ('id', 'journey_id', 'longitude', 'latitude')
 
 
 class JourneySerializer(serializers.ModelSerializer):
