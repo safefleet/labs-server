@@ -10,10 +10,10 @@ class Vehicle(models.Model):
 class Journey(models.Model):
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
-    car = models.ForeignKey(Vehicle, on_delete=models.CASCADE)
+    vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE)
 
 
 class Position(models.Model):
-    journey_id = models.ForeignKey(Journey, on_delete=models.CASCADE)
+    journey = models.ForeignKey(Journey, on_delete=models.CASCADE)
     latitude = models.FloatField()
     longitude = models.FloatField()

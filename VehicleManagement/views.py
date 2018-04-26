@@ -25,12 +25,12 @@ def vehicle_list(request):
 
 
 @api_view(['GET', 'PUT', 'PATCH', 'DELETE'])
-def vehicle_detail(request, pk):
+def vehicle_detail(request, vehicleId):
     """
     Retrieve, update or delete a vehicle.
     """
     try:
-        vehicle = Vehicle.objects.get(pk=pk)
+        vehicle = Vehicle.objects.get(pk=vehicleId)
     except Vehicle.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -58,17 +58,17 @@ def vehicle_detail(request, pk):
 
 
 @api_view(['GET'])
-def position_list(request,pk):
+def position_list(request, vehicleId):
 
     try:
-        vehicle = Vehicle.objects.get(pk=pk)
+        vehicle = Vehicle.objects.get(pk=vehicleId)
 
     except Vehicle.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     if request.method == 'GET':
-        journey = Journey.objects.filter(car=vehicle)
-        positions = Position.objects.filter( journey_id= journey)
+        journeys = Journey.objects.filter(vehicle=vehicle)
+        positions = Position.objects.filter(journey__in=journeys)
         serializer = PositionSerializer(positions, many=True)
         return Response(serializer.data)
 
@@ -76,29 +76,30 @@ def position_list(request,pk):
 
 
 @api_view(['GET'])
-def journey_list(request,pk):
+def journey_list(request, vehicleId):
 
     try:
-        vehicle = Vehicle.objects.get(pk=pk)
+        vehicle = Vehicle.objects.get(pk=vehicleId)
     except Vehicle.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     if request.method == 'GET':
-        journey = Journey.objects.filter(car=vehicle)
+        journey = Journey.objects.filter(vehicle=vehicle)
         serializer = JourneySerializer(journey, many=True)
         return Response(serializer.data)
 
 
-
 @api_view(['GET'])
-def position_list_filter(request, pk):
+def position_list_filter(request, vehicleId, journeyId):
     try:
-        vehicle = Vehicle.objects.get(pk=pk)
-        journey = Journey.objects.get(car = vehicle)
+        vehicle = Vehicle.objects.get(pk=vehicleId)
+        journey = Journey.objects.get(pk=journeyId, vehicle=vehicle)
+    except Journey.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
     except Vehicle.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     if request.method == 'GET':
-        positions = Position.objects.filter(journey_id=journey)
+        positions = Position.objects.filter(journey=journey)
         serializer = PositionSerializer(positions, many=True)
         return Response(serializer.data)
