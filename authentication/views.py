@@ -1,13 +1,13 @@
 from rest_framework import status, generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 
 from django.contrib.auth import login, authenticate
 
 from authentication.models import User
 from .serializers import UserSerializer
-
+from rest_framework import viewsets
 
 class AuthRegister(APIView):
 
@@ -50,10 +50,14 @@ class AuthLogin(APIView):
 class UserList(generics.ListCreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    permission_classes = (IsAdminUser,)
 
 
-class UserDetail(generics.RetrieveUpdateDestroyAPIView):
+class UserDetail(generics.RetrieveUpdateAPIView):
     serializer_class = UserSerializer
+    permission_classes = (AllowAny,)
+    lookup_field = 'username'
 
     def get_queryset(self):
-        return User.objects.all().filter(username=self.request.user)
+        username = self.kwargs['username']
+        return User.objects.filter(username=username)

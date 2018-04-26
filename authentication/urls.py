@@ -11,5 +11,5 @@ urlpatterns = [
     path('token-refresh/', refresh_jwt_token, name='token-refresh'),
     path('token-verify/', verify_jwt_token, name='token-verify'),
     path('users/', views.UserList.as_view(), name='user-list'),
-    path('users/<int:pk>/', views.UserDetail.as_view(), name='user-detail'),
+    path('users/<username>/', views.UserDetail.as_view(), name='user-detail'),
 ]
