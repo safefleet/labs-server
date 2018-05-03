@@ -2,16 +2,17 @@ from rest_framework import status, generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
+from rest_framework_jwt.views import ObtainJSONWebToken, RefreshJSONWebToken, VerifyJSONWebToken
+from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 
 from django.contrib.auth import login, authenticate
 
 from authentication.models import User
+
 from .serializers import UserSerializer
-from rest_framework import viewsets
+
 
 class AuthRegister(APIView):
-
-    # Register a new user.
     serializer_class = UserSerializer
     permission_classes = (AllowAny,)
 
@@ -22,37 +23,37 @@ class AuthRegister(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class AuthLogin(ObtainJSONWebToken):
+    pass
+    
+class AuthVerify(VerifyJSONWebToken):
+    pass
 
-class AuthLogin(APIView):
-
-    # Manual implementation of login method
-    @staticmethod
-    def post(request, format=None):
-        data = request.data
-        email = data.get('email', None)
-        password = data.get('password', None)
-
-        account = authenticate(email=email, password=password)
-        # Generate token and add it to the response object
-        if account is not None:
-            login(request, account)
-            return Response({
-                'status': 'Successful',
-                'message': 'You have successfully been logged into your account.'
-            }, status=status.HTTP_200_OK)
-
-        return Response({
-            'status': 'Unauthorized',
-            'message': 'Username/password combination invalid.'
-        }, status=status.HTTP_401_UNAUTHORIZED)
-
+class AuthRefresh(RefreshJSONWebToken):
+    pass
 
 class UserList(generics.ListCreateAPIView):
-    queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = (IsAdminUser,)
+    permission_classes = (IsAdminUser, )
+    queryset = User.objects.all()
+
+    
+
+class UserDetail(generics.RetrieveUpdateAPIView):
+    serializer_class = UserSerializer
+    authentication_classes = (JSONWebTokenAuthentication, )
+    permission_classes = (AllowAny, )
 
 
+    def get_object(self):
+        user = self.request.user
+        return user
+
+
+# curl -H "Authorization: JWT token" http://127.0.0.1:8000/api/auth/users/me/
+
+'''
+#detaliile pt useru curent
 class UserDetail(generics.RetrieveUpdateAPIView):
     serializer_class = UserSerializer
     permission_classes = (AllowAny,)
@@ -60,4 +61,9 @@ class UserDetail(generics.RetrieveUpdateAPIView):
 
     def get_queryset(self):
         username = self.kwargs['username']
+        # user = user.request.data
         return User.objects.filter(username=username)
+'''
+
+
+
