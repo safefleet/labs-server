@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from VehicleManagement.models import Position, Vehicle, Journey
+from vehicle.models import Position, Vehicle, Journey
 
 
 class VehicleSerializer(serializers.ModelSerializer):

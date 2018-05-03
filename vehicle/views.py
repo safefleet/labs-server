@@ -2,8 +2,8 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from VehicleManagement.models import Vehicle, Position,Journey
-from VehicleManagement.serializers import VehicleSerializer, PositionSerializer , JourneySerializer
+from vehicle.models import Vehicle, Position,Journey
+from vehicle.serializers import VehicleSerializer, PositionSerializer , JourneySerializer
 
 
 @api_view(['GET', 'POST'])

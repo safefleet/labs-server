@@ -1,5 +1,5 @@
 from django.conf.urls import url
-from VehicleManagement import views
+from vehicle import views
 from django.urls import path
 
 app_name = 'vehicles'
