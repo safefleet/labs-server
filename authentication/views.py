@@ -48,22 +48,3 @@ class UserDetail(generics.RetrieveUpdateAPIView):
     def get_object(self):
         user = self.request.user
         return user
-
-
-# curl -H "Authorization: JWT token" http://127.0.0.1:8000/api/auth/users/me/
-
-'''
-#detaliile pt useru curent
-class UserDetail(generics.RetrieveUpdateAPIView):
-    serializer_class = UserSerializer
-    permission_classes = (AllowAny,)
-    lookup_field = 'username'
-
-    def get_queryset(self):
-        username = self.kwargs['username']
-        # user = user.request.data
-        return User.objects.filter(username=username)
-'''
-
-
-
