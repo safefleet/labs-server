@@ -2,8 +2,8 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from vehicle.models import Vehicle, Position,Journey
-from vehicle.serializers import VehicleSerializer, PositionSerializer , JourneySerializer
+from vehicle.models import Vehicle, Position, Journey
+from vehicle.serializers import VehicleSerializer, PositionSerializer, JourneySerializer
 
 
 @api_view(['GET', 'POST'])
@@ -73,9 +73,7 @@ def position_list(request, vehicleId):
         return Response(serializer.data)
 
 
-
-
-@api_view(['GET'])
+@api_view(['GET', 'POST'])
 def journey_list(request, vehicleId):
 
     try:
@@ -88,8 +86,15 @@ def journey_list(request, vehicleId):
         serializer = JourneySerializer(journey, many=True)
         return Response(serializer.data)
 
+    if request.method == 'POST':
+        serializer = JourneySerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(['GET'])
+
+@api_view(['GET', 'POST'])
 def position_list_filter(request, vehicleId, journeyId):
     try:
         vehicle = Vehicle.objects.get(pk=vehicleId)
@@ -103,3 +108,11 @@ def position_list_filter(request, vehicleId, journeyId):
         positions = Position.objects.filter(journey=journey)
         serializer = PositionSerializer(positions, many=True)
         return Response(serializer.data)
+
+    if request.method == 'POST':
+        serializer = PositionSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
