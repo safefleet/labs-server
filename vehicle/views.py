@@ -89,7 +89,7 @@ def journey_list(request, vehicleId):
     if request.method == 'POST':
         serializer = JourneySerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(vehicle=vehicle)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -112,7 +112,7 @@ def position_list_filter(request, vehicleId, journeyId):
     if request.method == 'POST':
         serializer = PositionSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(journey=journey)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
