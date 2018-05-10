@@ -2,6 +2,7 @@ from django.db import models
 
 
 class Vehicle(models.Model):
+    id = models.IntegerField(primary_key=True)
     number = models.CharField(max_length=10)
     type = models.CharField(max_length=30)
     color = models.CharField(max_length=30)
