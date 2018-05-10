@@ -9,6 +9,7 @@ install:
 before_script:
   - mkdir -p ~/.ssh
   - echo ${SSH_PRIVATE_KEY} | base64 -d > ~/.ssh/id_rsa
+  - chmod go-rwx ~/.ssh/id_rsa
   - ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -p 22022 www-data@labs.safefleet.eu ls /var/www
 
 script:
