@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 
 import os
 
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -120,6 +121,24 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-SECRET_KEY = '6LusIIpGX0APCp1ubE5EQXsfKRWubZSM'
-CLIENT_ID = 'ligaac'
-ASYNC_TIMEOUT_VALUE = 10
+# Channels
+ASGI_APPLICATION = 'mysite.routing.application'
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+    },
+}
+
+
+try:
+    from .local_settings import *
+except ImportError:
+    # No local settings was found, skipping.
+    pass
+
+
+
+

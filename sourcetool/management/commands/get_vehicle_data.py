@@ -1,6 +1,7 @@
 import hashlib as h
 import asyncio
 import aiohttp
+import channels.layers
 
 import async_timeout
 import time
@@ -25,6 +26,7 @@ class Command(BaseCommand):
     async def _main(self):
 
         redis_que = RedisQueue('vehicles', charset='utf-8', decode_responses=True)
+        channel_layer = channels.layers.get_channel_layer()
 
         async with aiohttp.ClientSession() as session:
             while True:
@@ -46,7 +48,7 @@ class Command(BaseCommand):
 
                 # save to redis que
                 json_vehicle_data = json.dumps(new_vehicle_data)
-                redis_que.put(json_vehicle_data)
+                await channel_layer.send(settings.CHANNEL_NAME, {settings.JSON_DATA_KEY: json_vehicle_data})
 
                 # testing code
                 # unpacked = json.loads(redis_que.get())
@@ -61,7 +63,7 @@ class Command(BaseCommand):
 
     async def post_all_vehicle_data(self, session, url, all_adapted_vehicle_data):
         async with session.post(url, json=all_adapted_vehicle_data) as resp:
-            print(await resp.text())
+            print('Response:\n {}'.format(await resp.text()))
 
     def adapt_all_vehicle_data(self, all_vehicle_data) -> list:
         new_vehicle_data = []
@@ -82,7 +84,7 @@ class Command(BaseCommand):
     def _create_login_params(self) -> dict:
         timestamp = time.time()
 
-        text = settings.SECRET_KEY + str(int(timestamp))
+        text = settings.SECRET_KEY_AUTH + str(int(timestamp))
         signature = h.sha1(text.encode()).hexdigest()
 
         return {'client_id': settings.CLIENT_ID, 'timestamp': int(timestamp),
