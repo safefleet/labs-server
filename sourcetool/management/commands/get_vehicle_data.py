@@ -37,14 +37,14 @@ class Command(BaseCommand):
 
                 # TODO add desired urls
                 # post
-                # await self.post_all_vehicle_data(
-                #     session,
-                #     'url',
-                #     new_vehicle_data)  # post vehicles
+                await self.post_all_vehicle_data(
+                    session,
+                    'url',
+                    new_vehicle_data)  # post vehicles
 
                 await self.post_all_position_data(
                     session,
-                    'http://127.0.0.1:8000/sourcetool/',
+                    'url',
                     new_position_data)  # post positions
 
                 # save to redis que as json
