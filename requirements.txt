@@ -2,3 +2,4 @@ Django == 2.0.4
 djangorestframework == 3.8.2
 djangorestframework-jwt == 1.11.0
 channels == 2.1.1
+
