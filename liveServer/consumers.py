@@ -1,36 +1,32 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
 import json
 
+
 class VehicleConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        self.vehicle_id = self.scope['url_route']['kwargs']['vehicle_id']
-        self.vehicle_group_name = 'app_%s' % self.vehicle_id
+        vehicle_id = self.scope['url_route']['kwargs']['vehicle_id']
+        self.room_name = 'positions_for_vehicle_%s' % vehicle_id
+
+        # Join room group
+        await self.channel_layer.group_add(
+            self.room_name,
+            self.channel_name
+        )
 
         await self.accept()
 
-    # Receive message from WebSocket
-    async def receive(self, text_data):
-        text_data_json = json.loads(text_data)
-        message = text_data_json['message']
-
-        # Send message to room group
-        await self.channel_layer.send(
-            self.vehicle_group_name,
-            {
-                'type': 'vehicle_id',
-                'message': message
-            }
+    async def disconnect(self, close_code):
+        # Leave room group
+        await self.channel_layer.group_discard(
+            self.room_name,
+            self.channel_name
         )
 
-    async def chat_message(self, event):
-        message = event['message']
+    # Receive message from room group
+    async def vehicle_positions(self, event):
+        message = event['position']
 
         # Send message to WebSocket
         await self.send(text_data=json.dumps({
-            'message': message
+            'position': message
         }))
-
-    async def disconnect(self, close_code):
-        pass
-        # Called when the socket closes
-
