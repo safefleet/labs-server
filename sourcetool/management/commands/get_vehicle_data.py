@@ -78,6 +78,9 @@ class Command(BaseCommand):
             new_vehicle_data.append(new_data[0])
             new_position_data.append(new_data[1])
 
+
+
+
         return new_vehicle_data, new_position_data
 
     def adapt_data(self, vehicle_data) -> tuple:  # (vehicle, position)
