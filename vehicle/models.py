@@ -1,4 +1,5 @@
 from django.db import models
+from authentication.models import User
 
 
 class Vehicle(models.Model):
@@ -6,6 +7,7 @@ class Vehicle(models.Model):
     number = models.CharField(max_length=10)
     type = models.CharField(max_length=30)
     color = models.CharField(max_length=30)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
 
 
 class Journey(models.Model):

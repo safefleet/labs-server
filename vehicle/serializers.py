@@ -5,7 +5,9 @@ from vehicle.models import Position, Vehicle, Journey
 class VehicleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Vehicle
-        fields = ('id', 'number', 'type', 'color')
+        fields = ('id', 'number', 'type', 'color', 'owner')
+
+    owner = serializers.ReadOnlyField(source='owner.email')
 
 
 class PositionSerializer(serializers.ModelSerializer):
