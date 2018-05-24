@@ -5,7 +5,7 @@ from rest_framework.decorators import api_view, action
 from rest_framework.response import Response
 
 from vehicle.models import Vehicle, Position, Journey
-from vehicle.permissions import IsOwnerOrReadOnly
+from vehicle.permissions import IsOwner
 from vehicle.serializers import VehicleSerializer, PositionSerializer, JourneySerializer
 
 
@@ -21,8 +21,11 @@ class CreateListViewSet(mixins.CreateModelMixin,
 class VehicleViewSet(viewsets.ModelViewSet):
     queryset = Vehicle.objects.all()
     serializer_class = VehicleSerializer
-    permission_classes = (IsOwnerOrReadOnly,)
+    permission_classes = (IsOwner,)
     http_method_names = ('get', 'put', 'post', 'patch', 'delete')
+
+    def get_queryset(self):
+        return self.queryset.filter(owner=self.request.user)
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
@@ -44,7 +47,7 @@ class JourneyViewSet(CreateListViewSet):
     permissions = (permissions.IsAuthenticatedOrReadOnly,)
 
     def get_vehicle(self):
-        return get_object_or_404(Vehicle.objects.all(), pk=self.kwargs['vehicleId'])
+        return get_object_or_404(Vehicle.objects.all(), pk=self.kwargs['vehicle_id'])
 
     def get_queryset(self):
         vehicle = self.get_vehicle()
@@ -66,12 +69,12 @@ class PositionViewSet(CreateListViewSet):
         return self.queryset.filter(journey=journey)
 
     def get_vehicle(self):
-        return get_object_or_404(Vehicle.objects.all(), pk=self.kwargs['vehicleId'])
+        return get_object_or_404(Vehicle.objects.all(), pk=self.kwargs['vehicle_id'])
 
     def get_journey(self):
         vehicle = self.get_vehicle()
         journeys = Journey.objects.all().filter(vehicle=vehicle)
-        return get_object_or_404(journeys, pk=self.kwargs['journeyId'])
+        return get_object_or_404(journeys, pk=self.kwargs['journey_id'])
 
     def perform_create(self, serializer):
         journey = self.get_journey()

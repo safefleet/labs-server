@@ -4,6 +4,6 @@ from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
 router.register('', VehicleViewSet),
-router.register(r'(?P<vehicleId>[0-9]*)/journeys', JourneyViewSet)
-router.register(r'(?P<vehicleId>[0-9]*)/journeys/(?P<journeyId>[0-9]*)/positions', PositionViewSet)
+router.register(r'(?P<vehicle_id>[0-9]*)/journeys', JourneyViewSet)
+router.register(r'(?P<vehicle_id>[0-9]*)/journeys/(?P<journey_id>[0-9]*)/positions', PositionViewSet)
 urlpatterns = router.urls
