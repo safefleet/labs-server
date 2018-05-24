@@ -1,12 +1,16 @@
 from channels.auth import AuthMiddlewareStack
 from channels.routing import ProtocolTypeRouter, URLRouter
-import liveServer.routing
+from django.conf.urls import url
+from . import consumers
+
 
 application = ProtocolTypeRouter({
     # (http->django views is added by default)
     'websocket': AuthMiddlewareStack(
         URLRouter(
-            liveServer.routing.websocket_urlpatterns
+            [
+            	url(r'^position/(?P<vehicle_id>\d+)/$', consumers.VehicleConsumer),
+            ]
         )
     ),
 })
