@@ -8,7 +8,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/vehicles/', include('vehicle.urls')),
     path('api/auth/', include('authentication.urls')),
-    path('docs/', include_docs_urls(title='Safefleet LABS',
-                                    authentication_classes=[],
-                                    permission_classes=[]))
+    path('api/docs/', include_docs_urls(title='Safefleet LABS',
+                                        authentication_classes=[],
+                                        permission_classes=[]))
 ]
