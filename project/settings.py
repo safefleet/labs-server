@@ -169,6 +169,10 @@ JWT_AUTH = {
     'JWT_AUTH_HEADER_PREFIX': 'JWT',
 }
 
+
+LABS_API_BASE_URL = 'http://example.com/api'
+SAFEFLEET_API_BASE_URL = 'http://example.com/api'
+
 try:
     from .local_settings import *
 except ImportError:
