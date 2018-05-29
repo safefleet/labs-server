@@ -20,8 +20,6 @@ class Command(BaseCommand):
     previous_positions = []  # list that helps us to see if a location changed
     first_run = True
 
-    fill_positions_lock = asyncio.Lock()
-
     def handle(self, *args, **options):
         loop = asyncio.get_event_loop()
         tasks = [asyncio.Task(self._main_locations()), asyncio.Task(self._main_vehicles())]
