@@ -20,6 +20,8 @@ class Command(BaseCommand):
     previous_positions = []  # list that helps us to see if a location changed
     first_run = True
 
+    fill_positions_lock = asyncio.Lock()
+
     def handle(self, *args, **options):
         loop = asyncio.get_event_loop()
         tasks = [asyncio.Task(self._main_locations()), asyncio.Task(self._main_vehicles())]
@@ -36,7 +38,6 @@ class Command(BaseCommand):
                     if len(self.vehicles_set) > 0:  # wait for the current vehicles set to be filled
                         # check for new cars
                         new_vehicles_set = self.vehicles_set - self.previous_vehicles_set
-
                         # if there are any new cars post them
                         if len(new_vehicles_set) > 0:
                             # post
@@ -47,6 +48,7 @@ class Command(BaseCommand):
                                                      {'vehicle_data': json_vehicle_data})
                             # update reference set
                             self.previous_vehicles_set = set(self.vehicles_set)
+
                             print('New vehicles posted...')
                         else:
                             print('No vehicles updates..')
@@ -151,7 +153,9 @@ class Command(BaseCommand):
                 self.previous_positions[index]['position']['longitude'] = new_position['position']['longitude']
                 return True
 
-        return False
+            return False
+
+        return True  # it means that the new position list is bigger than the old one -> it changed
 
     def _create_login_params(self) -> dict:
         timestamp = time.time()
