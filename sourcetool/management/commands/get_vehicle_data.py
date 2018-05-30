@@ -18,7 +18,6 @@ class Command(BaseCommand):
     vehicles_set = set()  # set that grabs data from the 1 per sec loop and keeps the current state of the vehicles
 
     previous_positions = []  # list that helps us to see if a location changed
-    first_run = True
 
     def handle(self, *args, **options):
         loop = asyncio.get_event_loop()
@@ -51,7 +50,9 @@ class Command(BaseCommand):
                         else:
                             print('No vehicles updates..')
 
-                    await asyncio.sleep(3600 * 10)  # sleep for 10 minutes
+                        await asyncio.sleep(3600 * 10)  # sleep for 10 minutes
+                    else:
+                        await asyncio.sleep(3600)
 
         except Exception as e:
             print('Problems with the source tool. Program is exiting...\nException: {}'.format(e))
@@ -107,22 +108,13 @@ class Command(BaseCommand):
         new_vehicle_data = set()  # vehicle class set
         new_position_data = []
 
-        i = 0
         for vehicle_data in all_vehicle_data:
             new_data = self.adapt_data(vehicle_data)
 
             new_vehicle_data.add(new_data[0])
 
-            if not self.first_run:
-                if self._positions_changed(new_data[1], i):  # append only if the position changed
-                    new_position_data.append(new_data[1])
-            else:
+            if self._positions_changed(new_data[1]):  # append only if the position changed
                 new_position_data.append(new_data[1])
-                self.previous_positions.append(new_data[1])
-
-            i += 1
-
-        self.first_run = False  # after the first call of this function this param has to be false
 
         return new_vehicle_data, new_position_data
 
@@ -142,18 +134,27 @@ class Command(BaseCommand):
                              'moment': all_vehicle_data['moment']}
                 }
 
-    def _positions_changed(self, new_position, index):
+    def _positions_changed(self, new_position):
 
-        if index < len(self.previous_positions):
-            if self.previous_positions[index]['position']['latitude'] != new_position['position']['latitude'] or self.previous_positions[index]['position']['longitude'] != new_position['position']['longitude']:
-                # update the global list
-                self.previous_positions[index]['position']['latitude'] = new_position['position']['latitude']
-                self.previous_positions[index]['position']['longitude'] = new_position['position']['longitude']
-                return True
+        found = False
+        i = 0
+        for prev_pos in self.previous_positions:
+            if prev_pos['vehicle_id'] == new_position['vehicle_id']:
+                found = True
+                if prev_pos['position']['latitude'] != new_position['position']['latitude'] or prev_pos['position']['longitude'] != new_position['position']['longitude']:
+                    # update list
+                    self.previous_positions[i]['position']['latitude'] = new_position['position']['latitude']
+                    self.previous_positions[i]['position']['longitude'] = new_position['position']['longitude']
+                    return True
+                else:
+                    return False
+            i += 1
 
-            return False
+        if not found:  # if it was not found it means that the position changed
+            self.previous_positions.append(new_position)
+            return True
 
-        return True  # it means that the new position list is bigger than the old one -> it changed
+        return False
 
     def _create_login_params(self) -> dict:
         timestamp = time.time()
