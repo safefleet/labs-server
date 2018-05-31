@@ -13,6 +13,6 @@ before_script:
 
 script:
   - pycodestyle . --max-line-length=120
-  - ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -p 22022 www-data@labs.safefleet.eu cd labs-server && git pull
-  - ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -p 22022 www-data@labs.safefleet.eu cd labs-server && pip install -r requirements.txt
+  - ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -p 22022 www-data@labs.safefleet.eu "cd labs-server && git pull"
+  - ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -p 22022 www-data@labs.safefleet.eu "cd labs-server && pip install -r requirements.txt"
   
