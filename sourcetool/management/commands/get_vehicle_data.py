@@ -14,6 +14,28 @@ from django.conf import settings
 
 class Command(BaseCommand):
 
+    LOGIN_CLIENT_ID = 'client_id'
+    LOGIN_TIMESTAMP = 'timestamp'
+    LOGIN_SIGNATURE = 'signature'
+
+    API_VEHICLE_ID = 'vehicle_id'
+
+    API_VEHICLE = 'vehicle'
+    API_VEHICLE_NUMBER = 'number'
+    API_VEHICLE_TYPE = 'type'
+
+    API_POSITION = 'position'
+    API_POSITION_LAT = 'lat'
+    API_POSITION_LNG = 'lng'
+    API_POSITION_MOMENT = 'moment'
+
+    POST_VEHICLES_RELATIVE_URL = '/vehicles'
+    POST_POSITION_RELATIVE_URL = '/positions'
+    GET_ALL_DATA_RELATIVE_SAFEFLEET_URL = '/get_current_positions'
+
+    CHANNEL_VEHICLE_DATA = 'vehicle_data'
+    CHANNEL_LOCATION_DATA = 'location_data'
+
     previous_vehicles_set = set()  # set that keeps the previous state of the vehicles
     vehicles_set = set()  # set that grabs data from the 1 per sec loop and keeps the current state of the vehicles
 
@@ -42,7 +64,7 @@ class Command(BaseCommand):
                             # redis
                             json_vehicle_data = json.dumps(Vehicle.map_to_list_of_dicts(new_vehicles_set))
                             await channel_layer.send(settings.CHANNEL_NAME_VEHICLES,
-                                                     {'vehicle_data': json_vehicle_data})
+                                                     {self.CHANNEL_VEHICLE_DATA: json_vehicle_data})
                             # update reference set
                             self.previous_vehicles_set = set(self.vehicles_set)
 
@@ -52,10 +74,10 @@ class Command(BaseCommand):
 
                         await asyncio.sleep(3600 * 10)  # sleep for 10 minutes
                     else:
-                        await asyncio.sleep(3600)
+                        await asyncio.sleep(10)
 
         except Exception as e:
-            print('Problems with the source tool. Program is exiting...\nException: {}'.format(e))
+            print('Problems with the vehicles source tool. Program is exiting...\nException: {}'.format(e))
 
     async def _main_locations(self):
 
@@ -81,24 +103,24 @@ class Command(BaseCommand):
                     # save to redis que as json
                     json_location_data = json.dumps(new_position_data)
                     await channel_layer.send(settings.CHANNEL_NAME_VEHICLES_LOCATION,
-                                             {'location_data': json_location_data})
+                                             {self.CHANNEL_LOCATION_DATA: json_location_data})
 
                     print('Running _main')
                     await asyncio.sleep(1)
         except Exception as e:
-            print('Problems with the source tool. Program is exiting...\nException: {}'.format(e))
+            print('Problems with the location source tool. Program is exiting...\nException: {}'.format(e))
 
     async def fetch_all_vehicle_data(self, session, params):
         async with async_timeout.timeout(settings.ASYNC_TIMEOUT_VALUE):
-            async with session.get(settings.SAFEFLEET_API_BASE_URL + '/get_current_positions',
+            async with session.get(settings.SAFEFLEET_API_BASE_URL + self.GET_ALL_DATA_RELATIVE_SAFEFLEET_URL,
                                    params=params) as response:
                 return await response.json()
 
     async def post_all_vehicle_data(self, session, all_adapted_vehicle_data):
-        await self.post_data(session, '/vehicles', all_adapted_vehicle_data)
+        await self.post_data(session, self.POST_VEHICLES_RELATIVE_URL, all_adapted_vehicle_data)
 
     async def post_all_position_data(self, session, all_adapted_position_data):
-        await self.post_data(session, '/positions', all_adapted_position_data)
+        await self.post_data(session, self.POST_POSITION_RELATIVE_URL, all_adapted_position_data)
 
     async def post_data(self, session, relative_url, data):
         async with session.post(settings.LABS_API_BASE_URL + relative_url, json=data) as resp:
@@ -116,6 +138,8 @@ class Command(BaseCommand):
             if self._positions_changed(new_data[1]):  # append only if the position changed
                 new_position_data.append(new_data[1])
 
+        print(self.previous_positions)
+        print(new_position_data)
         return new_vehicle_data, new_position_data
 
     def adapt_data(self, all_vehicle_data) -> tuple:  # (vehicle, position)
@@ -123,38 +147,35 @@ class Command(BaseCommand):
 
     def adapt_vehicle_data(self, all_vehicle_data):
         return Vehicle(all_vehicle_data['vehicle']['vehicle_id'],
-                       {'vehicle': {'number': all_vehicle_data['vehicle']['license_plate'],
-                                    'type': all_vehicle_data['vehicle']['maker'] + " " + all_vehicle_data['vehicle'][
-                                        'model']}})
+                       {self.API_VEHICLE: {self.API_VEHICLE_NUMBER: all_vehicle_data['vehicle']['license_plate'],
+                                           self.API_VEHICLE_TYPE: all_vehicle_data['vehicle']['maker'] + " " +
+                                                                  all_vehicle_data['vehicle'][
+                                                                      'model']}})
 
     def adapt_position_data(self, all_vehicle_data):
-        return {'vehicle_id': all_vehicle_data['vehicle']['vehicle_id'],
-                'position': {'latitude': all_vehicle_data['lat'],
-                             'longitude': all_vehicle_data['lng'],
-                             'moment': all_vehicle_data['moment']}
+        return {self.API_VEHICLE_ID: all_vehicle_data['vehicle']['vehicle_id'],
+                self.API_POSITION: {self.API_POSITION_LAT: all_vehicle_data['lat'],
+                                    self.API_POSITION_LNG: all_vehicle_data['lng'],
+                                    self.API_POSITION_MOMENT: all_vehicle_data['moment']}
                 }
 
     def _positions_changed(self, new_position):
 
-        found = False
         i = 0
         for prev_pos in self.previous_positions:
-            if prev_pos['vehicle_id'] == new_position['vehicle_id']:
-                found = True
-                if prev_pos['position']['latitude'] != new_position['position']['latitude'] or prev_pos['position']['longitude'] != new_position['position']['longitude']:
+            if prev_pos[self.API_VEHICLE_ID] == new_position[self.API_VEHICLE_ID]:
+                if prev_pos[self.API_POSITION][self.API_POSITION_LAT] != new_position[self.API_POSITION][self.API_POSITION_LAT] or prev_pos[self.API_POSITION][self.API_POSITION_LNG] != new_position[self.API_POSITION][self.API_POSITION_LNG]:
                     # update list
-                    self.previous_positions[i]['position']['latitude'] = new_position['position']['latitude']
-                    self.previous_positions[i]['position']['longitude'] = new_position['position']['longitude']
+                    self.previous_positions[i][self.API_POSITION][self.API_POSITION_LAT] = new_position[self.API_POSITION][self.API_POSITION_LAT]
+                    self.previous_positions[i][self.API_POSITION][self.API_POSITION_LNG] = new_position[self.API_POSITION][self.API_POSITION_LNG]
                     return True
                 else:
                     return False
             i += 1
 
-        if not found:  # if it was not found it means that the position changed
-            self.previous_positions.append(new_position)
-            return True
-
-        return False
+        # if it was not found it means that the position changed and it has to be added to the cached positions list
+        self.previous_positions.append(new_position)
+        return True
 
     def _create_login_params(self) -> dict:
         timestamp = time.time()
@@ -162,8 +183,8 @@ class Command(BaseCommand):
         text = settings.SECRET_KEY_AUTH + str(int(timestamp))
         signature = h.sha1(text.encode()).hexdigest()
 
-        return {'client_id': settings.CLIENT_ID, 'timestamp': int(timestamp),
-                'signature': signature}
+        return {self.LOGIN_CLIENT_ID: settings.CLIENT_ID, self.LOGIN_TIMESTAMP: int(timestamp),
+                self.LOGIN_SIGNATURE: signature}
 
 
 class Vehicle(object):
@@ -173,7 +194,7 @@ class Vehicle(object):
         self.data = data
 
     def to_dict(self) -> dict:
-        self.data['vehicle_id'] = self.vehicle_id
+        self.data[Command.API_VEHICLE_ID] = self.vehicle_id
         return self.data
 
     def __hash__(self):
@@ -195,4 +216,3 @@ class Vehicle(object):
             vehicles_list.append(vehicle.to_dict())
 
         return vehicles_list
-
