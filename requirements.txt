@@ -4,3 +4,4 @@ djangorestframework-jwt == 1.11.0
 channels == 2.1.1
 channels-redis == 2.1.1
 coreapi == 2.3.3
+django-cors-headers == 2.2.0
