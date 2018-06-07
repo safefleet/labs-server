@@ -170,9 +170,18 @@ JWT_AUTH = {
     'JWT_AUTH_HEADER_PREFIX': 'JWT',
 }
 
-
 LABS_API_BASE_URL = 'http://example.com/api'
 SAFEFLEET_API_BASE_URL = 'http://example.com/api'
+
+ASGI_APPLICATION = 'mysite.routing.application'
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+    },
+}
 
 try:
     from .local_settings import *
