@@ -40,11 +40,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
     'rest_framework',
     'authentication',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -168,3 +170,5 @@ JWT_AUTH = {
 
     'JWT_AUTH_HEADER_PREFIX': 'JWT',
 }
+
+CORS_ORIGIN_ALLOW_ALL = True
