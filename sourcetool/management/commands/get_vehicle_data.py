@@ -64,6 +64,7 @@ class Command(BaseCommand):
     # the current vehicles their current journey from the labs server ( vehicle_id -> journey_id)
 
     start_vehicles_loop = False  # the _main_vehicles loop can't start until some preparations
+
     # are done in the _main_locations loop
 
     def handle(self, *args, **options):
@@ -237,8 +238,9 @@ class Command(BaseCommand):
         await self.post_data(self.POST_VEHICLES_RELATIVE_URL, adapted_vehicle_data, "Vehicle data")
 
     async def post_position_data(self, adapted_position_data, vehicle_id):
-        
-        if vehicle_id in self.vehicles_current_journeys and self.vehicles_current_journeys[vehicle_id] != self.NO_JOURNEY:
+
+        if vehicle_id in self.vehicles_current_journeys and \
+                self.vehicles_current_journeys[vehicle_id] != self.NO_JOURNEY:
             await self.post_data(
                 self.POST_POSITION_RELATIVE_URL.format(vehicle_id,
                                                        self.vehicles_current_journeys[vehicle_id]),
@@ -273,8 +275,7 @@ class Command(BaseCommand):
         return Vehicle(vehicle_data['vehicle']['vehicle_id'],
                        {self.API_VEHICLE: {self.API_VEHICLE_NUMBER: vehicle_data['vehicle']['license_plate'],
                                            self.API_VEHICLE_TYPE: vehicle_data['vehicle']['maker'] + " " +
-                                                                  vehicle_data['vehicle'][
-                                                                      'model'],
+                                           vehicle_data['vehicle']['model'],
                                            self.API_VEHICLE_COLOR: 'None'}})
 
     def adapt_position_data(self, vehicle_data):

@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'authentication',
-    'sourcetool.apps.SourcetoolConfig'
+    'sourcetool.apps.SourcetoolConfig',
     'channels'
 ]
 
