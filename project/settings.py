@@ -40,12 +40,15 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
     'rest_framework',
     'authentication',
     'sourcetool.apps.SourcetoolConfig'
+    'channels'
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -132,8 +135,8 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        #'rest_framework.authentication.SessionAuthentication',
-        #'rest_framework.authentication.BasicAuthentication',
+        # 'rest_framework.authentication.SessionAuthentication',
+        # 'rest_framework.authentication.BasicAuthentication',
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
     ),
 }
@@ -170,10 +173,13 @@ JWT_AUTH = {
     'JWT_AUTH_HEADER_PREFIX': 'JWT',
 }
 
+
 LABS_API_BASE_URL = 'http://example.com/api'
 SAFEFLEET_API_BASE_URL = 'http://example.com/api'
 
-ASGI_APPLICATION = 'mysite.routing.application'
+# Channels
+ASGI_APPLICATION = 'project.routing.application'
+
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
@@ -183,9 +189,12 @@ CHANNEL_LAYERS = {
     },
 }
 
+
 try:
     from .local_settings import *
 except ImportError:
     # No local settings was found, skipping.
     pass
+
+CORS_ORIGIN_ALLOW_ALL = True
 

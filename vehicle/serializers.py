@@ -20,4 +20,3 @@ class JourneySerializer(serializers.ModelSerializer):
     class Meta:
         model = Journey
         fields = ('id', 'start_time', 'stop_time')
-
