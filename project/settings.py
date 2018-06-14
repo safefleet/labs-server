@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'authentication',
-    'channels',
+    'sourcetool.apps.SourcetoolConfig',
+    'channels'
 ]
 
 MIDDLEWARE = [
@@ -172,8 +173,13 @@ JWT_AUTH = {
     'JWT_AUTH_HEADER_PREFIX': 'JWT',
 }
 
+
+LABS_API_BASE_URL = 'http://example.com/api'
+SAFEFLEET_API_BASE_URL = 'http://example.com/api'
+
 # Channels
 ASGI_APPLICATION = 'project.routing.application'
+
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
@@ -182,5 +188,12 @@ CHANNEL_LAYERS = {
         },
     },
 }
+
+
+try:
+    from .local_settings import *
+except ImportError:
+    # No local settings was found, skipping.
+    pass
 
 CORS_ORIGIN_ALLOW_ALL = True
