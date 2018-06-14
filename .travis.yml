@@ -16,7 +16,10 @@ script:
   - pycodestyle . --max-line-length=120 --exclude="*migrations*"
   
 deploy:
+  provider: script
   skip_cleanup: true
   script: ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -p 22022 www-data@labs.safefleet.eu "cd labs-server && git pull && source venvs/labs/bin/activate && cd labs-server && pip install -r requirements.txt"
   on:
-    branch: master
+    branches:
+    only:
+      - master
