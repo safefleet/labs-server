@@ -237,9 +237,8 @@ class Command(BaseCommand):
         await self.post_data(self.POST_VEHICLES_RELATIVE_URL, adapted_vehicle_data, "Vehicle data")
 
     async def post_position_data(self, adapted_position_data, vehicle_id):
-        print(self.POST_POSITION_RELATIVE_URL.format(vehicle_id,
-                                                       self.vehicles_current_journeys[vehicle_id]))
-        if self.vehicles_current_journeys[vehicle_id] != self.NO_JOURNEY:
+        
+        if vehicle_id in self.vehicles_current_journeys and self.vehicles_current_journeys[vehicle_id] != self.NO_JOURNEY:
             await self.post_data(
                 self.POST_POSITION_RELATIVE_URL.format(vehicle_id,
                                                        self.vehicles_current_journeys[vehicle_id]),
