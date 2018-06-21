@@ -275,8 +275,8 @@ class Command(BaseCommand):
     def adapt_vehicle_data(self, vehicle_data):
         return Vehicle(vehicle_data['vehicle']['vehicle_id'],
                        {self.API_VEHICLE: {self.API_VEHICLE_NUMBER: vehicle_data['vehicle']['license_plate'],
-                                           self.API_VEHICLE_TYPE: vehicle_data['vehicle']['maker'] + " " +
-                                                                  vehicle_data['vehicle']['model'],
+                                           self.API_VEHICLE_TYPE: vehicle_data['vehicle']['maker'] + " " + vehicle_data
+                                           ['vehicle']['model'],
                                            self.API_VEHICLE_COLOR: 'None'}})
 
     def adapt_position_data(self, vehicle_data):
