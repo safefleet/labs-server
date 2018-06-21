@@ -142,7 +142,7 @@ class Command(BaseCommand):
                 if len(new_position_data) > 0:
                     json_location_data = json.dumps(new_position_data)
                     await channel_layer.send(settings.CHANNEL_NAME_VEHICLES_LOCATION,
-                                         {self.CHANNEL_LOCATION_DATA: json_location_data})
+                                             {self.CHANNEL_LOCATION_DATA: json_location_data})
 
                 print('Running _main')
                 await asyncio.sleep(1)
@@ -276,7 +276,7 @@ class Command(BaseCommand):
         return Vehicle(vehicle_data['vehicle']['vehicle_id'],
                        {self.API_VEHICLE: {self.API_VEHICLE_NUMBER: vehicle_data['vehicle']['license_plate'],
                                            self.API_VEHICLE_TYPE: vehicle_data['vehicle']['maker'] + " " +
-                                           vehicle_data['vehicle']['model'],
+                                                                  vehicle_data['vehicle']['model'],
                                            self.API_VEHICLE_COLOR: 'None'}})
 
     def adapt_position_data(self, vehicle_data):
