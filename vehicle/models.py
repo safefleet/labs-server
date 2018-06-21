@@ -27,3 +27,14 @@ class Position(models.Model):
     latitude = models.FloatField()
     longitude = models.FloatField()
     moment = models.DateTimeField(auto_now_add=True)
+
+'''
+from django_filters import filters
+
+class Filter(FilterSet):
+    created = DateTimeFromToRangeFilter()
+
+    class Meta:
+        model = [Journey, Position]
+        fields = ['created']
+'''
