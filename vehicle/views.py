@@ -8,6 +8,10 @@ from vehicle.models import Vehicle, Position, Journey
 from vehicle.permissions import IsOwner
 from vehicle.serializers import VehicleSerializer, PositionSerializer, JourneySerializer
 
+from .pagination import CustomPagination
+
+import datetime
+
 
 class CreateListViewSet(mixins.CreateModelMixin,
                         mixins.ListModelMixin,
@@ -23,6 +27,7 @@ class VehicleViewSet(viewsets.ModelViewSet):
     serializer_class = VehicleSerializer
     permission_classes = (permissions.IsAuthenticated, IsOwner,)
     http_method_names = ('get', 'put', 'post', 'patch', 'delete')
+    pagination_class = CustomPagination
 
     def get_queryset(self):
         return self.queryset.filter(owner=self.request.user)
@@ -48,13 +53,15 @@ class JourneyViewSet(CreateListViewSet):
 
     def get_queryset(self):
         vehicle = self.get_vehicle()
+        print(self.request.GET)
         return self.queryset.filter(vehicle=vehicle)
 
     def get_vehicle_set(self):
         return Vehicle.objects.filter(owner=self.request.user)
 
     def get_vehicle(self):
-        return get_object_or_404(self.get_vehicle_set(), pk=self.kwargs['vehicle_id'])
+        print(self.kwargs['vehicle_id'])
+        return get_object_or_404(self.get_vehicle_set(), id=self.kwargs['vehicle_id'])
 
     def perform_create(self, serializer):
         vehicle = self.get_vehicle()
@@ -85,3 +92,4 @@ class PositionViewSet(CreateListViewSet):
     def perform_create(self, serializer):
         journey = self.get_journey()
         serializer.save(journey=journey)
+
