@@ -182,7 +182,7 @@ CHANNEL_LAYERS = {
         },
     },
 }
-1
+
 try:
     from .local_settings import *
 except ImportError:
