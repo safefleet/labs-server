@@ -11,10 +11,12 @@ before_script:
   - mkdir -p ~/.ssh
   - echo ${SSH_PRIVATE_KEY} | base64 -d > ~/.ssh/id_rsa
   - chmod go-rwx ~/.ssh/id_rsa
-  - pycodestyle . --max-line-length=120 --exclude="*migrations*"
-
-if: branch = master and type != pull_request
 
 script:
-  - ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -p 22022 www-data@labs.safefleet.eu "cd labs-server && git pull"
-  - ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -p 22022 www-data@labs.safefleet.eu "source venvs/labs/bin/activate && cd labs-server && pip install -r requirements.txt"
+ - pycodestyle . --max-line-length=120 --exclude="*migrations*"
+
+deploy:
+  provider: script
+  script: ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -p 22022 www-data@labs.safefleet.eu "cd labs-server && git pull && source venvs/labs/bin/activate && cd labs-server && pip install -r requirements.txt"
+  on:
+    branch: master
